@@ -1,0 +1,1 @@
+2013-09-12 07:45:06,655 - ERROR: Your args for signature checking must be <type 'str'>

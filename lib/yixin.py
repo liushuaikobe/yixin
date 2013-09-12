@@ -41,7 +41,7 @@ class YiXin(object):
 		'''
 		msgType = self.getMsgType(rawMsg)
 		msg = None
-		if msgType = constant.TEXT_TYPE:
+		if msgType == constant.TEXT_TYPE:
 			if not self.textMsgBuilder:
 				self.textMsgBuilder = messagebuilder.TextMsgBuilder(rawMsg)
 			else:
@@ -58,7 +58,8 @@ class YiXin(object):
 		return self.reply.replyText(toUser, fromUser, content)
 
 	def getMsgType(self, rawMsg):
-		return ElementTree.find(constant.MSG_TYPE_NODE_NAME).text
+		root = ElementTree.fromstring(rawMsg.encode('utf-8'))
+		return root.find(constant.MSG_TYPE_NODE_NAME).text
 
 class Reply(object):
 	'''

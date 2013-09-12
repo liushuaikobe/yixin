@@ -4,8 +4,8 @@ msg = '<xml> <ToUserName><![CDATA[toUser]]></ToUserName> <FromUserName><![CDATA[
 
 def main():
 	root = ElementTree.fromstring(msg)
-	for node in root:
-		print node.tag, node.text
+	# for node in root:
+	# 	print node.tag, node.text
 	print root.find('MsgType').text
 
 if __name__ == '__main__':

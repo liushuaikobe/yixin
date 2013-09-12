@@ -1,4 +1,5 @@
 import hashlib
+import time
 from xml.etree import ElementTree
 
 import utils 
@@ -12,6 +13,7 @@ class YiXin(object):
 	'''
 	def __init__(self, token):
 		self.token = token
+		self.reply = Reply()
 		self.textMsgBuilder = None
 		# TODO add builder
 
@@ -49,18 +51,30 @@ class YiXin(object):
 		callback(msgType, msg)
 		return msg
 
-	# def reply()
+	def replyText(self, toUser, fromUser, content=''):
+		'''
+		Wrpper for Reply Text message.
+		'''
+		return self.reply.replyText(toUser, fromUser, content)
 
-	def getMsgType(rawMsg):
+	def getMsgType(self, rawMsg):
 		return ElementTree.find(constant.MSG_TYPE_NODE_NAME).text
 
-def main():
+class Reply(object):
 	'''
-	Just for testing.
+	Get the reply message.
 	'''
-	y = YiXin('lvzlp')
-	y.checkSignature('1', '1', '2',  7.99)
+	def __init__(self):
+		pass
 
-if __name__ == '__main__':
-	main()
+	def replyText(self, toUser, fromUser, content=''):
+		args = ()
+		return self.render(constant.REPLY_TEXT_TEMPLATE, (toUser, fromUser, self.getCurrentTime(), content))
+
+	def getCurrentTime(self):
+		return str(int(time.time()))
+
+	def render(self, template, args):
+		return template % tuple(args)
+
 

@@ -9,7 +9,7 @@ class MsgBuilder(object):
 	def build(self):
 		raise NotImplementedError
 
-	def setXmlStr(xmlStr):
+	def setXmlStr(self, xmlStr):
 		self.xmlStr = xmlStr
 
 class TextMsgBuilder(MsgBuilder):

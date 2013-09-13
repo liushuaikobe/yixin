@@ -15,7 +15,10 @@ class YiXin(object):
 		self.token = token
 		self.reply = Reply()
 		self.textMsgBuilder = None
+		self.picMsgBuilder = None
 		# TODO add builder
+		self.onTextMsgReceivedCallback = None
+		self.onPicMsgReceivedCallback = None
 
 	def checkSignature(self, signature, timestamp, nonce, echostr):
 		'''
@@ -41,12 +44,22 @@ class YiXin(object):
 		'''
 		msgType = self.getMsgType(rawMsg)
 		msg = None
+		# we received a text message
 		if msgType == constant.TEXT_TYPE:
 			if not self.textMsgBuilder:
 				self.textMsgBuilder = messagebuilder.TextMsgBuilder(rawMsg)
 			else:
 				self.textMsgBuilder.setXmlStr(rawMsg)
 			msg = self.textMsgBuilder.build()
+			self.onTextMsgReceivedCallback(msgType, msg)
+		# we received a image message
+		elif msgType == constant.PIC_TYPE:
+			if not self.picMsgBuilder:
+				self.picMsgBuilder = messagebuilder.PicMsgBuilder(rawMsg)
+			else:
+				self.picMsgBuilder.setXmlStr(rawMsg)
+			msg = self.picMsgBuilder.build()
+			self.onPicMsgReceivedCallback(msgType, msg)
 		# TODO add msg type judgement
 		if callable(callback):
 			callback(msgType, msg)
@@ -61,6 +74,14 @@ class YiXin(object):
 	def getMsgType(self, rawMsg):
 		root = ElementTree.fromstring(rawMsg.encode('utf-8'))
 		return root.find(constant.MSG_TYPE_NODE_NAME).text
+
+	def setOnTextMsgReceivedCallback(self, callback):
+		assert callable(callback)
+		self.onTextMsgReceivedCallback = callback
+
+	def setOnPicMsgReceivedCallback(self, callback):
+		assert callable(callback)
+		self.onPicMsgReceivedCallback = callback
 
 class Reply(object):
 	'''

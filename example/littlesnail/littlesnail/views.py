@@ -18,6 +18,8 @@ TOKEN = "lovezlp"
 
 yixinApp = yixin.YiXin(TOKEN)
 
+replyMsg = None
+
 @csrf_exempt
 def handleRequest(request):
 	log.log(log.INFO, 'reveive request')
@@ -36,9 +38,16 @@ def handleRequest(request):
 		return HttpResponse(yixinApp.checkSignature(signature, timestamp, nonce, echoStr), content_type='text/plain')
 
 	if request.method == 'POST':
-		msg = yixinApp.handleMessage(request.raw_post_data)
-
-		if msg.getMsgType() == constant.TEXT_TYPE: # we receive a text msg from some user
-			replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
-			
+		yixinApp.handleMessage(request.raw_post_data)
 		return HttpResponse(replyMsg, content_type='application/xml')
+
+def receivedTextMsgCallback(msgType, msg):
+	global replyMsg
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
+
+def receivedPicMsgCallback(msgType, msg):
+	global replyMsg
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getPicUrl(), '\n----\n', 'Your Pic')))
+
+yixinApp.setOnTextMsgReceivedCallback(receivedTextMsgCallback)
+yixinApp.setOnPicMsgReceivedCallback(receivedPicMsgCallback)

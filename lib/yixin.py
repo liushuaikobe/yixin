@@ -48,7 +48,8 @@ class YiXin(object):
 				self.textMsgBuilder.setXmlStr(rawMsg)
 			msg = self.textMsgBuilder.build()
 		# TODO add msg type judgement
-		callback(msgType, msg)
+		if callable(callback):
+			callback(msgType, msg)
 		return msg
 
 	def replyText(self, toUser, fromUser, content=''):

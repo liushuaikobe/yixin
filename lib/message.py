@@ -3,7 +3,7 @@ class Msg(object):
 	Base class of messages posted from YiXin server.
 	'''
 	def __init__(self):
-		meta = {
+		self.meta = {
 		'ToUserName' : '', # 1
 		'FromUserName' : '', # 2
 		'CreateTime' : '', # 3

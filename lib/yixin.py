@@ -67,9 +67,15 @@ class YiXin(object):
 
 	def replyText(self, toUser, fromUser, content=''):
 		'''
-		Wrpper for Reply Text message.
+		Wrpper for replying text message.
 		'''
 		return self.reply.replyText(toUser, fromUser, content)
+
+	def replyMusic(self, toUser, fromUser, title, description, musicUrl, HQMusicUrl):
+		'''
+		Wrapper for replying music message.
+		'''
+		return self.reply.replyMusic(toUser, fromUser, title, description, musicUrl, HQMusicUrl)
 
 	def getMsgType(self, rawMsg):
 		root = ElementTree.fromstring(rawMsg.encode('utf-8'))
@@ -91,8 +97,10 @@ class Reply(object):
 		pass
 
 	def replyText(self, toUser, fromUser, content=''):
-		args = ()
 		return self.render(constant.REPLY_TEXT_TEMPLATE, (toUser, fromUser, self.getCurrentTime(), content))
+
+	def replyMusic(self, toUser, fromUser, title, description, musicUrl, HQMusicUrl):
+		return self.render(constant.REPLY_MUSIC_TEMPLATE, (toUser, fromUser, self.getCurrentTime(), title, description, musicUrl, HQMusicUrl))
 
 	def getCurrentTime(self):
 		return str(int(time.time()))

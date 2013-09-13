@@ -43,7 +43,10 @@ def handleRequest(request):
 
 def receivedTextMsgCallback(msgType, msg):
 	global replyMsg
-	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
+	if msg.getContent() == 'music':
+		replyMsg = yixinApp.replyMusic(msg.getFromUserName(), msg.getToUsername(), 'Every Moment Of My Life', 'very nice~', 'http://219.217.227.89/test.mp3', 'http://219.217.227.89/test.mp3')
+	else:
+		replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
 
 def receivedPicMsgCallback(msgType, msg):
 	global replyMsg

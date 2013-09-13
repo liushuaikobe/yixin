@@ -45,6 +45,22 @@ def receivedTextMsgCallback(msgType, msg):
 	global replyMsg
 	if msg.getContent() == 'music':
 		replyMsg = yixinApp.replyMusic(msg.getFromUserName(), msg.getToUsername(), 'Every Moment Of My Life', 'very nice~', 'http://219.217.227.89/test.mp3', 'http://219.217.227.89/test.mp3')
+	elif msg.getContent() == 'news':
+		article1 = yixin.Article()
+		article1.setTitle('Test News')
+		article1.setDescription('Every moment of My Life.')
+		article1.setPicUrl('http://219.217.227.89/1.jpeg')
+		article1.setUrl('http://219.217.227.89/index.html')
+
+		article2 = yixin.Article()
+		article2.setTitle('Test News too')
+		article2.setDescription('Need you now.')
+		article2.setPicUrl('http://219.217.227.89/2.jpeg')
+		article2.setUrl('http://219.217.227.89/index.html')
+
+		artiles = [article1, article2]
+
+		replyMsg = yixinApp.replyNews(msg.getFromUserName(), msg.getToUsername(), 2, artiles)
 	else:
 		replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
 

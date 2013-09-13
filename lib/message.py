@@ -75,17 +75,3 @@ class LocationMsg(Msg):
 
 	def getLabel(self):
 		return self.meta['Label']
-
-
-
-
-
-
-
-
-
-
-
-
-
-

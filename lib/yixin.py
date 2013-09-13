@@ -14,11 +14,14 @@ class YiXin(object):
 	def __init__(self, token):
 		self.token = token
 		self.reply = Reply()
+
 		self.textMsgBuilder = None
 		self.picMsgBuilder = None
+		self.locationBuilder = None
 		# TODO add builder
 		self.onTextMsgReceivedCallback = None
 		self.onPicMsgReceivedCallback = None
+		self.onLocationMsgReceivedCallback = None
 
 	def checkSignature(self, signature, timestamp, nonce, echostr):
 		'''
@@ -60,6 +63,14 @@ class YiXin(object):
 				self.picMsgBuilder.setXmlStr(rawMsg)
 			msg = self.picMsgBuilder.build()
 			self.onPicMsgReceivedCallback(msgType, msg)
+		# we received a image message
+		elif msgType == constant.LOCATION_TYPE:
+			if not self.locationBuilder:
+				self.locationBuilder = messagebuilder.LocationMsgBuilder(rawMsg)
+			else:
+				self.locationBuilder.setXmlStr(rawMsg)
+			msg = self.locationBuilder.build()
+			self.onLocationMsgReceivedCallback(msgType, msg)
 		# TODO add msg type judgement
 		if callable(callback):
 			callback(msgType, msg)
@@ -88,6 +99,10 @@ class YiXin(object):
 	def setOnPicMsgReceivedCallback(self, callback):
 		assert callable(callback)
 		self.onPicMsgReceivedCallback = callback
+
+	def setOnLocationMsgReceivedCallback(self, callback):
+		assert callable(callback)
+		self.onLocationMsgReceivedCallback = callback
 
 class Reply(object):
 	'''

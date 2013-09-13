@@ -52,5 +52,10 @@ def receivedPicMsgCallback(msgType, msg):
 	global replyMsg
 	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getPicUrl(), '\n----\n', 'Your Pic')))
 
+def receivedLocationMsgCallback(msgType, msg):
+	global replyMsg
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getLocation_X(), '\n', msg.getLocation_Y(), '\n', msg.getScale(), '\n', msg.getLabel())))
+
 yixinApp.setOnTextMsgReceivedCallback(receivedTextMsgCallback)
 yixinApp.setOnPicMsgReceivedCallback(receivedPicMsgCallback)
+yixinApp.setOnLocationMsgReceivedCallback(receivedLocationMsgCallback)

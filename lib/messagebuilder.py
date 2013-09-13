@@ -38,4 +38,16 @@ class PicMsgBuilder(MsgBuilder):
 		for node in root:
 			self.picMsg.meta[node.tag] = unicode(node.text, 'utf-8')
 		return self.picMsg
+
+class LocationMsgBuilder(MsgBuilder):
+	def __init__(self, xmlStr):
+		MsgBuilder.__init__(self, xmlStr)
+		self.locationMsg = message.LocationMsg()
+
+	def build(self):
+		root = ElementTree.fromstring(self.xmlStr)
+		assert root.tag == 'xml'
+		for node in root:
+			self.locationMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+		return self.locationMsg
 		

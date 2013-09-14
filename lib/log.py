@@ -7,7 +7,7 @@ WARNING = logging.WARNING
 INFO = logging.INFO
 DEBUG = logging.DEBUG
 
-logging.basicConfig(filename='/home/dev-user/yixin_log.txt', level = logging.DEBUG, filemode = 'w', format = '%(asctime)s - %(levelname)s: %(message)s')  
+logging.basicConfig(filename='/home/dev-user/yixin_log.txt', level = logging.DEBUG, filemode = 'a', format = '%(asctime)s - %(levelname)s: %(message)s')  
 
 def log(level, msg):
 	if level == DEBUG:

@@ -55,7 +55,8 @@ class YiXin(object):
 			else:
 				self.textMsgBuilder.setXmlStr(rawMsg)
 			msg = self.textMsgBuilder.build()
-			self.onTextMsgReceivedCallback(msgType, msg)
+			if callable(self.onTextMsgReceivedCallback):
+				self.onTextMsgReceivedCallback(msgType, msg)
 		# we received a image message
 		elif msgType == constant.PIC_TYPE:
 			if not self.picMsgBuilder:
@@ -63,7 +64,8 @@ class YiXin(object):
 			else:
 				self.picMsgBuilder.setXmlStr(rawMsg)
 			msg = self.picMsgBuilder.build()
-			self.onPicMsgReceivedCallback(msgType, msg)
+			if callable(self.onPicMsgReceivedCallback):
+				self.onPicMsgReceivedCallback(msgType, msg)
 		# we received a image message
 		elif msgType == constant.LOCATION_TYPE:
 			if not self.locationBuilder:
@@ -71,7 +73,8 @@ class YiXin(object):
 			else:
 				self.locationBuilder.setXmlStr(rawMsg)
 			msg = self.locationBuilder.build()
-			self.onLocationMsgReceivedCallback(msgType, msg)
+			if callable(self.onLocationMsgReceivedCallback):
+				self.onLocationMsgReceivedCallback(msgType, msg)
 		# TODO add msg type judgement
 		if callable(callback):
 			callback(msgType, msg)

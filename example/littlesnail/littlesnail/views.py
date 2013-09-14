@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 libpath = '/home/dev-user/djangoapp/yixin/lib'
+# libpath = '/Users/liushuai/git/PythonProject/yixin/lib'
 if libpath not in sys.path:
 	sys.path.append(libpath)
 print sys.path
@@ -14,9 +15,41 @@ import yixin
 import constant
 import log
 
-TOKEN = "lovezlp"
+TOKEN = 'lovezlp'
+AppID = 'ca2c526a88744b5e98c0ac548de22725'
+AppSecret = '0b331b59196141caa5dcb00df2f73fa9'
 
-yixinApp = yixin.YiXin(TOKEN)
+yixinApp = yixin.YiXin(TOKEN, AppID, AppSecret)
+
+buttonGroup = yixin.ButtonGroup()
+
+btn1 = yixin.CommonClickButton()
+btn1.setName('kobe')
+btn1.setKey('btn1')
+
+btn2 = yixin.CommonClickButton()
+btn2.setName('wade')
+btn2.setKey('btn2')
+
+btn3 = yixin.TopLevelButton()
+btn3.setName('test subbtn')
+
+subBtn1 = yixin.CommonClickButton()
+subBtn1.setName('james')
+subBtn1.setKey('subbtn1')
+
+subBtn2 = yixin.CommonClickButton()
+subBtn2.setName('bosh')
+subBtn2.setKey('subbtn2')
+
+btn3.addSubButton(subBtn1)
+btn3.addSubButton(subBtn2)
+
+buttonGroup.addButton(btn1)
+buttonGroup.addButton(btn2)
+buttonGroup.addButton(btn3)
+
+menu1 = yixinApp.addMenu(buttonGroup)
 
 replyMsg = None
 

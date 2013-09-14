@@ -3,6 +3,7 @@ MSG_TYPE_NODE_NAME = 'MsgType'
 TEXT_TYPE = 'text'
 PIC_TYPE = 'image'
 LOCATION_TYPE = 'location'
+EVENT_TYPE = 'event'
 
 GET_TOKEN_URL = 'https://api.yixin.im/cgi-bin/token'
 ADD_TOKEN_URL = 'https://api.yixin.im/cgi-bin/menu/create?access_token='

@@ -75,3 +75,21 @@ class LocationMsg(Msg):
 
 	def getLabel(self):
 		return self.meta['Label']
+
+class EventMsg(Msg):
+	'''
+	Event Push.
+	NOTICE : This kind of message doesn't contain MsgId tag.
+	'''
+	def __init__(self):
+		Msg.__init__(self)
+		self.meta.update({
+				'Event' : '', # 6
+				'EventKey' : '' # 7
+			})
+
+	def getEvent(self):
+		return self.meta['Event']
+
+	def getEventKey(self):
+		return self.meta['EventKey']

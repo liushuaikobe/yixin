@@ -105,6 +105,12 @@ def receivedLocationMsgCallback(msgType, msg):
 	global replyMsg
 	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getLocation_X(), '\n', msg.getLocation_Y(), '\n', msg.getScale(), '\n', msg.getLabel())))
 
+def receivedEventMsgCallback(msgType, msg):
+	global replyMsg
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getEvent(), '\n', msg.getEventKey())))
+
+
 yixinApp.setOnTextMsgReceivedCallback(receivedTextMsgCallback)
 yixinApp.setOnPicMsgReceivedCallback(receivedPicMsgCallback)
 yixinApp.setOnLocationMsgReceivedCallback(receivedLocationMsgCallback)
+yixinApp.setOnEventMsgReceivedCallback(receivedEventMsgCallback)

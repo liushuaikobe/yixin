@@ -26,11 +26,13 @@ class YiXin(object):
 
 		self.textMsgBuilder = None
 		self.picMsgBuilder = None
-		self.locationBuilder = None
+		self.locationMsgBuilder = None
+		self.eventMsgBuilder = None
 		
 		self.onTextMsgReceivedCallback = None
 		self.onPicMsgReceivedCallback = None
 		self.onLocationMsgReceivedCallback = None
+		self.onEventMsgReceivedCallback = None
 
 	def checkSignature(self, signature, timestamp, nonce, echostr):
 		'''
@@ -76,13 +78,22 @@ class YiXin(object):
 				self.onPicMsgReceivedCallback(msgType, msg)
 		# we received a image message
 		elif msgType == constant.LOCATION_TYPE:
-			if not self.locationBuilder:
-				self.locationBuilder = messagebuilder.LocationMsgBuilder(rawMsg)
+			if not self.locationMsgBuilder:
+				self.locationMsgBuilder = messagebuilder.LocationMsgBuilder(rawMsg)
 			else:
-				self.locationBuilder.setXmlStr(rawMsg)
-			msg = self.locationBuilder.build()
+				self.locationMsgBuilder.setXmlStr(rawMsg)
+			msg = self.locationMsgBuilder.build()
 			if callable(self.onLocationMsgReceivedCallback):
 				self.onLocationMsgReceivedCallback(msgType, msg)
+		# we received a event push
+		elif msgType == constant.EVENT_TYPE:
+			if not self.eventMsgBuilder:
+				self.eventMsgBuilder = messagebuilder.EventMsgBuilder(rawMsg)
+			else:
+				self.eventMsgBuilder.setXmlStr(rawMsg)
+			msg = self.eventMsgBuilder.build()
+			if callable(self.onEventMsgReceivedCallback):
+				self.onEventMsgReceivedCallback(msgType, msg)
 		if callable(callback):
 			callback(msgType, msg)
 		return msg
@@ -120,6 +131,10 @@ class YiXin(object):
 	def setOnLocationMsgReceivedCallback(self, callback):
 		assert callable(callback)
 		self.onLocationMsgReceivedCallback = callback
+
+	def setOnEventMsgReceivedCallback(self, callback):
+		assert callable(callback)
+		self.onEventMsgReceivedCallback = callback
 
 	def getAccessToken(self):
 		if self.accessToken and self.accessTokenExpiresIn and self.accessTokenGetTimeStamp: # We have got the access token.

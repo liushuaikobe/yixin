@@ -48,10 +48,3 @@ if __name__ == '__main__':
 	result = simplejson.loads(result)
 	print result
 	print result['access_token']
-
-
-
-
-
-
-

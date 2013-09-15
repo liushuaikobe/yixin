@@ -1,5 +1,6 @@
 import hashlib
 import time
+import simplejson
 from xml.etree import ElementTree as etree
 from xml.etree.ElementTree import Element, SubElement, ElementTree
 
@@ -12,17 +13,26 @@ class YiXin(object):
 	'''
 	Main class of this lib.
 	'''
-	def __init__(self, token):
+	def __init__(self, token, appId, appSecret):
 		self.token = token
+		self.appId = appId
+		self.appSecret = appSecret
+
+		self.accessToken = None
+		self.accessTokenExpiresIn = None
+		self.accessTokenGetTimeStamp = None
+
 		self.reply = Reply()
 
 		self.textMsgBuilder = None
 		self.picMsgBuilder = None
-		self.locationBuilder = None
-		# TODO add builder
+		self.locationMsgBuilder = None
+		self.eventMsgBuilder = None
+		
 		self.onTextMsgReceivedCallback = None
 		self.onPicMsgReceivedCallback = None
 		self.onLocationMsgReceivedCallback = None
+		self.onEventMsgReceivedCallback = None
 
 	def checkSignature(self, signature, timestamp, nonce, echostr):
 		'''
@@ -55,7 +65,8 @@ class YiXin(object):
 			else:
 				self.textMsgBuilder.setXmlStr(rawMsg)
 			msg = self.textMsgBuilder.build()
-			self.onTextMsgReceivedCallback(msgType, msg)
+			if callable(self.onTextMsgReceivedCallback):
+				self.onTextMsgReceivedCallback(msgType, msg)
 		# we received a image message
 		elif msgType == constant.PIC_TYPE:
 			if not self.picMsgBuilder:
@@ -63,16 +74,26 @@ class YiXin(object):
 			else:
 				self.picMsgBuilder.setXmlStr(rawMsg)
 			msg = self.picMsgBuilder.build()
-			self.onPicMsgReceivedCallback(msgType, msg)
+			if callable(self.onPicMsgReceivedCallback):
+				self.onPicMsgReceivedCallback(msgType, msg)
 		# we received a image message
 		elif msgType == constant.LOCATION_TYPE:
-			if not self.locationBuilder:
-				self.locationBuilder = messagebuilder.LocationMsgBuilder(rawMsg)
+			if not self.locationMsgBuilder:
+				self.locationMsgBuilder = messagebuilder.LocationMsgBuilder(rawMsg)
 			else:
-				self.locationBuilder.setXmlStr(rawMsg)
-			msg = self.locationBuilder.build()
-			self.onLocationMsgReceivedCallback(msgType, msg)
-		# TODO add msg type judgement
+				self.locationMsgBuilder.setXmlStr(rawMsg)
+			msg = self.locationMsgBuilder.build()
+			if callable(self.onLocationMsgReceivedCallback):
+				self.onLocationMsgReceivedCallback(msgType, msg)
+		# we received a event push
+		elif msgType == constant.EVENT_TYPE:
+			if not self.eventMsgBuilder:
+				self.eventMsgBuilder = messagebuilder.EventMsgBuilder(rawMsg)
+			else:
+				self.eventMsgBuilder.setXmlStr(rawMsg)
+			msg = self.eventMsgBuilder.build()
+			if callable(self.onEventMsgReceivedCallback):
+				self.onEventMsgReceivedCallback(msgType, msg)
 		if callable(callback):
 			callback(msgType, msg)
 		return msg
@@ -110,6 +131,32 @@ class YiXin(object):
 	def setOnLocationMsgReceivedCallback(self, callback):
 		assert callable(callback)
 		self.onLocationMsgReceivedCallback = callback
+
+	def setOnEventMsgReceivedCallback(self, callback):
+		assert callable(callback)
+		self.onEventMsgReceivedCallback = callback
+
+	def getAccessToken(self):
+		if self.accessToken and self.accessTokenExpiresIn and self.accessTokenGetTimeStamp: # We have got the access token.
+			if time.time() - self.accessTokenGetTimeStamp < self.accessTokenExpiresIn: # The access token is valid until now.
+				return self.accessToken
+		url = constant.GET_TOKEN_URL
+		params = {
+			'grant_type' : 'client_credential',
+			'appid' : self.appId,
+			'secret' : self.appSecret
+		}
+		result = simplejson.loads(utils.doGet(url, params))
+		self.accessToken = result['access_token']
+		self.accessTokenExpiresIn = float(result['expires_in'])
+		self.accessTokenGetTimeStamp = time.time()
+		return self.accessToken
+
+	def addMenu(self, buttonGroup):
+		log.log(log.DEBUG, simplejson.dumps(buttonGroup.meta))
+		utils.doPostWithoutParamsEncoding(''.join((constant.ADD_TOKEN_URL, self.getAccessToken())), \
+			simplejson.dumps(buttonGroup.meta))
+
 
 class Reply(object):
 	'''
@@ -166,3 +213,54 @@ class Article(object):
 	def setUrl(self, url):
 		self.meta['Url'] = url
 
+class Button(object):
+	'''
+	Base class of the Menu Button.
+	'''
+	CLICK_TYPE = 'click'
+	def __init__(self):
+		self.meta = {
+			'name' : '',
+		}
+
+	def setName(self, name):
+		self.meta['name'] = name
+
+class CommonClickButton(Button):
+	'''
+	 A common click-type Button including name and type and key.
+	'''
+	def __init__(self):
+		Button.__init__(self)
+		self.meta.update({
+				'type' : Button.CLICK_TYPE,
+				'key' : ''
+			})
+
+	def setKey(self, key):
+		self.meta['key'] = key
+
+class TopLevelButton(Button):
+	'''
+	A top level button than contains some sub-buttons.
+	'''
+	def __init__(self):
+		Button.__init__(self)
+		self.meta.update({
+				'sub_button' : []
+			})
+
+	def addSubButton(self, commonButton):
+		self.meta['sub_button'].append(commonButton.meta)
+
+class ButtonGroup(object):
+	'''
+	A group of buttons.
+	'''
+	def __init__(self):
+		self.meta = {
+			'button' : []
+		}
+
+	def addButton(self, button):
+		self.meta['button'].append(button.meta)

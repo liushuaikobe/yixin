@@ -51,3 +51,14 @@ class LocationMsgBuilder(MsgBuilder):
 			self.locationMsg.meta[node.tag] = unicode(node.text, 'utf-8')
 		return self.locationMsg
 		
+class EventMsgBuilder(MsgBuilder):
+	def __init__(self, xmlStr):
+		MsgBuilder.__init__(self, xmlStr)
+		self.eventMsg = message.EventMsg()
+
+	def build(self):
+		root = ElementTree.fromstring(self.xmlStr)
+		assert root.tag == 'xml'
+		for node in root:
+			self.eventMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+		return self.eventMsg

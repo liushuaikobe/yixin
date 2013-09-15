@@ -11,6 +11,8 @@ from django.template import RequestContext, Template
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.encoding import smart_str, smart_unicode
 
+from pymongo import MongoClient
+
 import yixin
 import constant
 import log
@@ -19,37 +21,14 @@ TOKEN = 'lovezlp'
 AppID = 'ca2c526a88744b5e98c0ac548de22725'
 AppSecret = '0b331b59196141caa5dcb00df2f73fa9'
 
+client = None
+db = None
+if not client:
+	client = MongoClient('localhost', 27017)
+	if not db:
+		db = client.gitarchive
+
 yixinApp = yixin.YiXin(TOKEN, AppID, AppSecret)
-
-buttonGroup = yixin.ButtonGroup()
-
-btn1 = yixin.CommonClickButton()
-btn1.setName('kobe')
-btn1.setKey('btn1')
-
-btn2 = yixin.CommonClickButton()
-btn2.setName('wade')
-btn2.setKey('btn2')
-
-btn3 = yixin.TopLevelButton()
-btn3.setName('test subbtn')
-
-subBtn1 = yixin.CommonClickButton()
-subBtn1.setName('james')
-subBtn1.setKey('subbtn1')
-
-subBtn2 = yixin.CommonClickButton()
-subBtn2.setName('bosh')
-subBtn2.setKey('subbtn2')
-
-btn3.addSubButton(subBtn1)
-btn3.addSubButton(subBtn2)
-
-buttonGroup.addButton(btn1)
-buttonGroup.addButton(btn2)
-buttonGroup.addButton(btn3)
-
-menu1 = yixinApp.addMenu(buttonGroup)
 
 replyMsg = None
 
@@ -75,42 +54,29 @@ def handleRequest(request):
 		return HttpResponse(replyMsg, content_type='application/xml')
 
 def receivedTextMsgCallback(msgType, msg):
-	global replyMsg
-	if msg.getContent() == 'music':
-		replyMsg = yixinApp.replyMusic(msg.getFromUserName(), msg.getToUsername(), 'Every Moment Of My Life', 'very nice~', 'http://219.217.227.89/test.mp3', 'http://219.217.227.89/test.mp3')
-	elif msg.getContent() == 'news':
-		article1 = yixin.Article()
-		article1.setTitle('Test News')
-		article1.setDescription('Every moment of My Life.')
-		article1.setPicUrl('http://219.217.227.89/1.jpeg')
-		article1.setUrl('http://219.217.227.89/index.html')
-
-		article2 = yixin.Article()
-		article2.setTitle('Test News too')
-		article2.setDescription('Need you now.')
-		article2.setPicUrl('http://219.217.227.89/2.jpeg')
-		article2.setUrl('http://219.217.227.89/index.html')
-
-		artiles = [article1, article2]
-
-		replyMsg = yixinApp.replyNews(msg.getFromUserName(), msg.getToUsername(), 2, artiles)
+	global replyMsg, db
+	yesterdayCollection = db.yesterday
+	timelines = yesterdayCollection.find({'actor_attributes.login': msg.getContent()})
+	count = timelines.count()
+	if count < 1:
+		count = 'no activity'
+	elif count == 1:
+		count = '1 activity'
 	else:
-		replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
+		count = '%s activities' % count
+	event = {}
+	for timeline in timelines:
+		if timeline['type'] in event:
+			event[timeline['type']] += 1
+		else:
+			event[timeline['type']] = 1
+	details = []
+	for e in event:
+		details.append('%s %s' % (e, event[e]))
+	details = '\n'.join(tuple(details))
 
-def receivedPicMsgCallback(msgType, msg):
-	global replyMsg
-	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getPicUrl(), '\n----\n', 'Your Pic')))
-
-def receivedLocationMsgCallback(msgType, msg):
-	global replyMsg
-	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getLocation_X(), '\n', msg.getLocation_Y(), '\n', msg.getScale(), '\n', msg.getLabel())))
-
-def receivedEventMsgCallback(msgType, msg):
-	global replyMsg
-	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getEvent(), '\n', msg.getEventKey())))
-
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), \
+				msg.getToUsername(), \
+				content='%s, you have %s yesterday.\n----\n%s' % (msg.getContent(), count, details))
 
 yixinApp.setOnTextMsgReceivedCallback(receivedTextMsgCallback)
-yixinApp.setOnPicMsgReceivedCallback(receivedPicMsgCallback)
-yixinApp.setOnLocationMsgReceivedCallback(receivedLocationMsgCallback)
-yixinApp.setOnEventMsgReceivedCallback(receivedEventMsgCallback)

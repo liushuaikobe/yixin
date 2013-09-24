@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import hashlib
 import time
 import simplejson
@@ -117,7 +118,7 @@ class YiXin(object):
 		return self.reply.replyNews(toUser, fromUser, articleCount, articles)
 
 	def getMsgType(self, rawMsg):
-		root = etree.fromstring(rawMsg.encode('utf-8'))
+		root = etree.fromstring(rawMsg)
 		return root.find(constant.MSG_TYPE_NODE_NAME).text
 
 	def setOnTextMsgReceivedCallback(self, callback):

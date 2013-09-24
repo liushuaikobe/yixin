@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class Msg(object):
 	'''
 	Base class of messages posted from YiXin server.

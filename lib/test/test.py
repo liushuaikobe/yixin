@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from xml.etree import ElementTree as etree
 from xml.etree.ElementTree import Element, SubElement, ElementTree
 import urllib

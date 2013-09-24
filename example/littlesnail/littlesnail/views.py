@@ -21,36 +21,6 @@ AppSecret = '0b331b59196141caa5dcb00df2f73fa9'
 
 yixinApp = yixin.YiXin(TOKEN, AppID, AppSecret)
 
-buttonGroup = yixin.ButtonGroup()
-
-btn1 = yixin.CommonClickButton()
-btn1.setName('kobe')
-btn1.setKey('btn1')
-
-btn2 = yixin.CommonClickButton()
-btn2.setName('wade')
-btn2.setKey('btn2')
-
-btn3 = yixin.TopLevelButton()
-btn3.setName('test subbtn')
-
-subBtn1 = yixin.CommonClickButton()
-subBtn1.setName('james')
-subBtn1.setKey('subbtn1')
-
-subBtn2 = yixin.CommonClickButton()
-subBtn2.setName('bosh')
-subBtn2.setKey('subbtn2')
-
-btn3.addSubButton(subBtn1)
-btn3.addSubButton(subBtn2)
-
-buttonGroup.addButton(btn1)
-buttonGroup.addButton(btn2)
-buttonGroup.addButton(btn3)
-
-menu1 = yixinApp.addMenu(buttonGroup)
-
 replyMsg = None
 
 @csrf_exempt
@@ -94,6 +64,39 @@ def receivedTextMsgCallback(msgType, msg):
 		artiles = [article1, article2]
 
 		replyMsg = yixinApp.replyNews(msg.getFromUserName(), msg.getToUsername(), 2, artiles)
+	elif msg.getContent() == 'add':
+		buttonGroup = yixin.ButtonGroup()
+
+		btn1 = yixin.CommonClickButton()
+		btn1.setName('kobe')
+		btn1.setKey('btn1')
+
+		btn2 = yixin.CommonClickButton()
+		btn2.setName('wade')
+		btn2.setKey('btn2')
+
+		btn3 = yixin.TopLevelButton()
+		btn3.setName('test subbtn')
+
+		subBtn1 = yixin.CommonClickButton()
+		subBtn1.setName('james')
+		subBtn1.setKey('subbtn1')
+
+		subBtn2 = yixin.CommonClickButton()
+		subBtn2.setName('bosh')
+		subBtn2.setKey('subbtn2')
+
+		btn3.addSubButton(subBtn1)
+		btn3.addSubButton(subBtn2)
+
+		buttonGroup.addButton(btn1)
+		buttonGroup.addButton(btn2)
+		buttonGroup.addButton(btn3)
+
+		yixinApp.addMenu(buttonGroup)
+	elif msg.getContent() == 'delete':
+		yixinApp.deleteMenu()
+		replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content='Delete successful')
 	else:
 		replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getContent(), '\n----\n', 'Yours')))
 

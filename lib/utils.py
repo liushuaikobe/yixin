@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import types
 import urllib
 import urllib2

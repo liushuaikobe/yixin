@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import message
 
 from xml.etree import ElementTree
@@ -24,7 +25,7 @@ class TextMsgBuilder(MsgBuilder):
 		root = ElementTree.fromstring(self.xmlStr)
 		assert root.tag == 'xml'
 		for node in root:
-			self.textMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+			self.textMsg.meta[node.tag] = node.text
 		return self.textMsg
 
 class PicMsgBuilder(MsgBuilder):
@@ -36,7 +37,7 @@ class PicMsgBuilder(MsgBuilder):
 		root = ElementTree.fromstring(self.xmlStr)
 		assert root.tag == 'xml'
 		for node in root:
-			self.picMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+			self.picMsg.meta[node.tag] = node.text
 		return self.picMsg
 
 class LocationMsgBuilder(MsgBuilder):
@@ -48,7 +49,7 @@ class LocationMsgBuilder(MsgBuilder):
 		root = ElementTree.fromstring(self.xmlStr)
 		assert root.tag == 'xml'
 		for node in root:
-			self.locationMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+			self.locationMsg.meta[node.tag] = node.text
 		return self.locationMsg
 		
 class EventMsgBuilder(MsgBuilder):
@@ -60,5 +61,5 @@ class EventMsgBuilder(MsgBuilder):
 		root = ElementTree.fromstring(self.xmlStr)
 		assert root.tag == 'xml'
 		for node in root:
-			self.eventMsg.meta[node.tag] = unicode(node.text, 'utf-8')
+			self.eventMsg.meta[node.tag] = node.text
 		return self.eventMsg

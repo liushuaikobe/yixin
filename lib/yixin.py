@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import hashlib
 import time
 import simplejson
@@ -117,7 +118,7 @@ class YiXin(object):
 		return self.reply.replyNews(toUser, fromUser, articleCount, articles)
 
 	def getMsgType(self, rawMsg):
-		root = etree.fromstring(rawMsg.encode('utf-8'))
+		root = etree.fromstring(rawMsg)
 		return root.find(constant.MSG_TYPE_NODE_NAME).text
 
 	def setOnTextMsgReceivedCallback(self, callback):
@@ -154,8 +155,26 @@ class YiXin(object):
 
 	def addMenu(self, buttonGroup):
 		log.log(log.DEBUG, simplejson.dumps(buttonGroup.meta))
-		utils.doPostWithoutParamsEncoding(''.join((constant.ADD_TOKEN_URL, self.getAccessToken())), \
+		utils.doPostWithoutParamsEncoding(''.join((constant.ADD_MENU_URL, self.getAccessToken())), \
 			simplejson.dumps(buttonGroup.meta))
+
+	def deleteMenu(self):
+		'''
+		Delete the menu.
+		'''
+		log.log(log.DEBUG, 'Delete menu.')
+		params = {
+			'access_token' : self.getAccessToken()
+		}
+		result = utils.doGet(constant.DELETE_MENU_URL, params)
+		log.log(log.DEBUG, result)
+
+	def queryCurrentMenu(self):
+		'''
+		Get the current structure of the menu.
+		'''
+		pass
+
 
 
 class Reply(object):

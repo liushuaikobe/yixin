@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+# change this to your own path
 libpath = '/home/dev-user/djangoapp/yixin/lib'
 # libpath = '/Users/liushuai/git/PythonProject/yixin/lib'
 if libpath not in sys.path:

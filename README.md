@@ -148,6 +148,30 @@ if libpath not in sys.path:
 	```
 	注意：可能由于易信的缓存，对菜单的操作不能立即看到效果
 
+## 注意
+1. 日志    
+	在SDK中，log（`lib/log.py`）模块将log文件的路径设置成了：`/home/dev-user/yixin_log.txt`；    
+	这是SDK开发者在开发时的路径，在使用时 **务必将其改为实际的log文件** ；    
+	此外，还必须要将 **log文件的权限设置为可写** （`chmod`）。 
+2. 本Repo中的Example      
+	`view.py`中，lib的路径设置的也是SDK开发者在开发时的路径，要运行例子，也要将lib的路径修改为实际lib路径。
+3. 与微信公众账号关系      
+	就目前来看，易信公众账号的开放API是微信公众账号开放API的子集。也即易信公众账号已支持的API与微信的一模一样，稍加改动即可应用到微信公众账号。
+
+## 期望添加的功能
+
+- 简单的session支持
+- 菜单查询（API已支持，但本SDK中未实现）
+
+## 本Repo中Example
+![code](./pic/code.jpg)
+![code](./pic/screen_1.jpg)
+![code](./pic/screen_2.jpg)
+
+## License
+The MIT License (MIT)
+
 ## 向作者捐助
 如果你觉得本项目对你有用，欢迎请作者一杯茶。                
+      
 [![捐赠liushuaikobe](https://img.alipay.com/sys/personalprod/style/mc/btn-index.png)](https://me.alipay.com/liushuaikobe)

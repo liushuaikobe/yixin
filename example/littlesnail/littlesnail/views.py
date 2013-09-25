@@ -25,7 +25,7 @@ replyMsg = None
 
 @csrf_exempt
 def handleRequest(request):
-	log.log(log.INFO, 'reveive request')
+	log.log(log.INFO, 'receive request')
 
 	if request.method == 'GET':
 		log.log(log.INFO, 'GET')
@@ -108,12 +108,20 @@ def receivedLocationMsgCallback(msgType, msg):
 	global replyMsg
 	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getLocation_X(), '\n', msg.getLocation_Y(), '\n', msg.getScale(), '\n', msg.getLabel())))
 
-def receivedEventMsgCallback(msgType, msg):
+def userSubscribeCallback(msgType, msg):
+	global replyMsg
+	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content='Welcome to subscribe!')
+
+def userUnSubscribeCallback(msgType, msg):
+	log.log(log.INFO, 'unsubscribe: ' + msg.getFromUserName())
+
+def buttonClickCallback(msgType, msg):
 	global replyMsg
 	replyMsg = yixinApp.replyText(msg.getFromUserName(), msg.getToUsername(), content=''.join((msg.getEvent(), '\n', msg.getEventKey())))
-
 
 yixinApp.setOnTextMsgReceivedCallback(receivedTextMsgCallback)
 yixinApp.setOnPicMsgReceivedCallback(receivedPicMsgCallback)
 yixinApp.setOnLocationMsgReceivedCallback(receivedLocationMsgCallback)
-yixinApp.setOnEventMsgReceivedCallback(receivedEventMsgCallback)
+yixinApp.setOnButtonClickCallback(buttonClickCallback)
+yixinApp.setOnUserSubscribeCallback(userSubscribeCallback)
+yixinApp.setOnUserUnsbscribeCallback(userUnSubscribeCallback)

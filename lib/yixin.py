@@ -34,6 +34,9 @@ class YiXin(object):
 		self.onPicMsgReceivedCallback = None
 		self.onLocationMsgReceivedCallback = None
 		self.onEventMsgReceivedCallback = None
+		self.onButtonClickCallback = None
+		self.onUserSubscribeCallback = None
+		self.onUserUnsbscribeCallback = None
 
 	def checkSignature(self, signature, timestamp, nonce, echostr):
 		'''
@@ -52,6 +55,14 @@ class YiXin(object):
 		else:
 			log.log(log.ERROR, 'Signature checking failed.')
 			return None
+
+	##     ##    ###    ##    ## ########  ##       ########         ##     ##  ######   ######   
+	##     ##   ## ##   ###   ## ##     ## ##       ##               ###   ### ##    ## ##    ##  
+	##     ##  ##   ##  ####  ## ##     ## ##       ##               #### #### ##       ##        
+	######### ##     ## ## ## ## ##     ## ##       ######           ## ### ##  ######  ##   #### 
+	##     ## ######### ##  #### ##     ## ##       ##               ##     ##       ## ##    ##  
+	##     ## ##     ## ##   ### ##     ## ##       ##               ##     ## ##    ## ##    ##  
+	##     ## ##     ## ##    ## ########  ######## ######## ####### ##     ##  ######   ######   
 
 	def handleMessage(self, rawMsg, callback=None):
 		'''
@@ -95,9 +106,32 @@ class YiXin(object):
 			msg = self.eventMsgBuilder.build()
 			if callable(self.onEventMsgReceivedCallback):
 				self.onEventMsgReceivedCallback(msgType, msg)
+			# dispatch the specific event
+			event = msg.getEvent().lower()
+			# new subscribe
+			if event == constant.SUBSCRIBE_EVENT:
+				if callable(self.onUserSubscribeCallback):
+					self.onUserSubscribeCallback(msgType, msg)
+			# new unsubscribe
+			elif event == constant.UNSUBSCRIBE_EVENT:
+				if callable(self.onUserUnsbscribeCallback):
+					self.onUserUnsbscribeCallback(msgType, msg)
+			# button clicked
+			elif event == constant.CLICK_EVETN:
+				if callable(self.onButtonClickCallback):
+					self.onButtonClickCallback(msgType, msg)
+
 		if callable(callback):
 			callback(msgType, msg)
 		return msg
+
+	########  ######## ########  ##       ##    ## 
+	##     ## ##       ##     ## ##        ##  ##  
+	##     ## ##       ##     ## ##         ####   
+	########  ######   ########  ##          ##    
+	##   ##   ##       ##        ##          ##    
+	##    ##  ##       ##        ##          ##    
+	##     ## ######## ##        ########    ##   
 
 	def replyText(self, toUser, fromUser, content=''):
 		'''
@@ -121,6 +155,14 @@ class YiXin(object):
 		root = etree.fromstring(rawMsg)
 		return root.find(constant.MSG_TYPE_NODE_NAME).text
 
+	 ######     ###    ##       ##       ########     ###     ######  ##    ## 
+	##    ##   ## ##   ##       ##       ##     ##   ## ##   ##    ## ##   ##  
+	##        ##   ##  ##       ##       ##     ##  ##   ##  ##       ##  ##   
+	##       ##     ## ##       ##       ########  ##     ## ##       #####    
+	##       ######### ##       ##       ##     ## ######### ##       ##  ##   
+	##    ## ##     ## ##       ##       ##     ## ##     ## ##    ## ##   ##  
+	 ######  ##     ## ######## ######## ########  ##     ##  ######  ##    ## 
+
 	def setOnTextMsgReceivedCallback(self, callback):
 		assert callable(callback)
 		self.onTextMsgReceivedCallback = callback
@@ -137,9 +179,22 @@ class YiXin(object):
 		assert callable(callback)
 		self.onEventMsgReceivedCallback = callback
 
+	def setOnButtonClickCallback(self, callback):
+		assert callable(callback)
+		self.onButtonClickCallback = callback
+
+	def setOnUserSubscribeCallback(self, callback):
+		assert callable(callback)
+		self.onUserSubscribeCallback = callback
+
+	def setOnUserUnsbscribeCallback(self, callback):
+		assert callable(callback)
+		self.onUserUnsbscribeCallback = callback
+
 	def getAccessToken(self):
 		if self.accessToken and self.accessTokenExpiresIn and self.accessTokenGetTimeStamp: # We have got the access token.
 			if time.time() - self.accessTokenGetTimeStamp < self.accessTokenExpiresIn: # The access token is valid until now.
+				log.log(log.DEBUG, self.accessToken + '  old')
 				return self.accessToken
 		url = constant.GET_TOKEN_URL
 		params = {
@@ -151,7 +206,16 @@ class YiXin(object):
 		self.accessToken = result['access_token']
 		self.accessTokenExpiresIn = float(result['expires_in'])
 		self.accessTokenGetTimeStamp = time.time()
+		log.log(log.DEBUG, self.accessToken + '  new')
 		return self.accessToken
+
+	##     ## ######## ##    ## ##     ## 
+	###   ### ##       ###   ## ##     ## 
+	#### #### ##       ####  ## ##     ## 
+	## ### ## ######   ## ## ## ##     ## 
+	##     ## ##       ##  #### ##     ## 
+	##     ## ##       ##   ### ##     ## 
+	##     ## ######## ##    ##  #######  
 
 	def addMenu(self, buttonGroup):
 		log.log(log.DEBUG, simplejson.dumps(buttonGroup.meta))
